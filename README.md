@@ -12,3 +12,6 @@ Firmware is currently an Arduino ino file. This will be updated to be AVR native
 
 ## Docs/Samples
 Various recordings of the progress of the pedal belong here.
+
+## Web
+The web dir contains the marketing site, blog, and mailing list.
