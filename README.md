@@ -1,23 +1,23 @@
 # Bluebox
 A customizable stompbox with bluetooth connection.
 
-## Circuits
+## circuits
 The circuits files included with the "asc" extension can be opened with LTSpice.
 
-## Scripts
+## scripts
 There is a python script to construct a WAV audio file from a file of text data.
 
-## Firmware
+## firmware
 Firmware is currently an Arduino ino file. This will be updated to be AVR native and written in C.
 
-## API
+## api
 API is the server side code responsible for distributing binaries/kernels and handling database/analytic/notification services.
 
 ## iOS
 iOS is the client side application for iOS, and eventually iPadOS and macOS.
 
-## Docs/Samples
+## docs/samples
 Various recordings of the progress of the pedal belong here.
 
-## Web
+## web
 The web dir contains the marketing site, blog, and mailing list.
