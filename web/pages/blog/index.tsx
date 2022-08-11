@@ -13,8 +13,18 @@ const Blog: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <h3>Bluebox blog</h3>
-        <p>A blog about the development of a bluetooth guitar pedal. Also covers product & feature announcements.</p>
+        <h3 className={styles.logo}>Bluebox blog</h3>
+        <h1 className={styles.title}>Latest</h1>
+        <p className={styles.description}>A blog about the development of a bluetooth guitar pedal. Also covers product & feature announcements.</p>
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
+        <PostOverview />
         <PostOverview />
       </main>
 
