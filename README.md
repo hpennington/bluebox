@@ -10,5 +10,5 @@ There is a python script to construct a WAV audio file from a list of data
 ## Firmware
 Firmware is currently an Arduino ino file. This will be updated to be AVR native and written in C.
 
-## Samples
+## Docs/Samples
 Various recordings of the progress of the pedal belong here.
