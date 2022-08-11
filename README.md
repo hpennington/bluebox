@@ -4,7 +4,7 @@ A customizable stompbox with bluetooth connection.
 ## Circuits
 The circuits files included with the "asc" extension can be opened with LTSpice.
 
-## Utils
+## Scripts
 There is a python script to construct a WAV audio file from a file of text data.
 
 ## Firmware
