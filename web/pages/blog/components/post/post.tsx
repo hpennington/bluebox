@@ -1,9 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
-import {Header} from '../../components/header/header.tsx'
-import {PostOverview} from './components/posts/post-overview.tsx'
-import styles from './Blog.module.css'
+import styles from './post.module.css'
 
 const Blog: NextPage = () => {
   return (
@@ -14,19 +12,9 @@ const Blog: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <Header />
+        <h3 className={styles.logo}>Bluebox blog</h3>
         <h1 className={styles.title}>Latest</h1>
         <p className={styles.description}>A blog about the development of a bluetooth guitar pedal. Also covers product & feature announcements.</p>
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
       </main>
 
       <footer className={styles.footer}>

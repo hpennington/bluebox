@@ -1,0 +1,5 @@
+site_name: Bluebox Docs
+docs_dir: mkdocs
+plugins: []
+theme:
+  gitbook
