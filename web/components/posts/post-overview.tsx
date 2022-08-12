@@ -10,6 +10,6 @@ export const PostOverview = () => (
       <a href="">GUIDE</a>
     </div>
     <p>An overview of the new features released in v1 - code block copy, multiple authors, frontmatter layout and more</p>
-    <a href="">Read more -></a>
+    <a href="">Read more</a>
   </div>
 )
