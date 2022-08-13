@@ -1,5 +1,5 @@
 # Bluebox (Work in progress)
-A customizable stompbox with bluetooth connection.
+A customizable stompbox with bluetooth connectivity.
 
 ![Protoboard](https://github.com/hpennington/bluebox/raw/main/docs/images/protoboard.jpeg)
 
