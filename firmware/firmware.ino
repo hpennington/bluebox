@@ -147,12 +147,12 @@ void setup()
 //---------------------------------------------------
 void loop()
 {
-//      uint16_t a0 = analogRead(A0);
-//      output_low = lowByte(a0);
-//      output_high = highByte(a0);      
+      uint16_t a0 = analogRead(A0);
+      output_low = lowByte(a0);
+      output_high = highByte(a0);      
 
-     output_low = lowByte(sintab2[lookup]);
-     output_high = highByte(sintab2[lookup]);
+//     output_low = lowByte(sintab2[lookup]);
+//     output_high = highByte(sintab2[lookup]);
       uint16_t val = (output_high << 4) | (output_low >> 4);
 //      uint16_t val = (output_high & 0xFF) << 8 | output_low;
 
