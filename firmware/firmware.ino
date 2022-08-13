@@ -80,64 +80,13 @@ int sintab2[512] =
 void setup()
 {
 
-//////  Serial.begin(115200);
-//////  // setup ADC
-//  ADMUX = 0x60; // left adjust, adc0, internal vcc
-////  ADMUX &= (0 << REFS1);
-////  ADMUX |= (1 << REFS0);
-//  ADCSRA = 0xe5; // turn on adc, ck/32, auto trigger
-////  ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-//  
-//  ADCSRB =0x07; // t1 capture for trigger
-//  DIDR0 = 0x01; // turn off digital inputs for adc0
-//  ADCSRA |= B00001000;
-////////
-//////// clear ADLAR in ADMUX (0x7C) to right-adjust the result
-//////  // ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
-//////  ADMUX &= B11011111;
-//////  
-//////  // Set REFS1..0 in ADMUX (0x7C) to change reference voltage to the
-//////  // proper source (01)
-//////  ADMUX |= B01000000;
-//////  
-//////  // Clear MUX3..0 in ADMUX (0x7C) in preparation for setting the analog
-//////  // input
-//////  ADMUX &= B11110000;
-//////  
-//////  // Set MUX3..0 in ADMUX (0x7C) to read from AD8 (Internal temp)
-//////  // Do not set above 15! You will overrun other parts of ADMUX. A full
-//////  // list of possible inputs is available in Table 24-4 of the ATMega328
-//////  // datasheet
-//////  ADMUX |= 8;
-//////  // ADMUX |= B00001000; // Binary equivalent
-//////  
-//////  // Set ADEN in ADCSRA (0x7A) to enable the ADC.
-//////  // Note, this instruction takes 12 ADC clocks to execute
-//  ADCSRA |= B10000000;
-//////  
-//////  // Set ADATE in ADCSRA (0x7A) to enable auto-triggering.
-////  ADCSRA |= B00100000;
-//////  
-//////  // Clear ADTS2..0 in ADCSRB (0x7B) to set trigger mode to free running.
-//////  // This means that as soon as an ADC has finished, the next will be
-//////  // immediately started.
-////  ADCSRB &= B11111000;
-//////  
-//////  // Set the Prescaler to 128 (16000KHz/128 = 125KHz)
-//////  // Above 200KHz 10-bit results are not reliable.
-//  ADCSRA |= B00000111;
-//////  
-//////  // Set ADIE in ADCSRA (0x7A) to enable the ADC interrupt.
-//////  // Without this, the internal interrupt will not trigger.
-//  ADCSRA |= B00001000;
-//////  
-//////  // Enable global interrupts
-//////  // AVR macro included in <avr/interrupts.h>, which the Arduino IDE
-//////  // supplies by default.
-////  sei();
-//////  
-//////  // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
-//  ADCSRA |=B01000000;
+//  Serial.begin(115200);
+  // setup ADC
+  ADMUX = 0x60; // left adjust, adc0, internal vcc
+  ADCSRA = 0xe5; // turn on adc, ck/32, auto trigger
+  ADCSRA |= (1 << ADPS2) | (1 << ADPS1) & (1 << ADPS0);
+  DIDR0 = 0x01; // turn off digital inputs for adc0
+  ADCSRA |= B00001000;
 
   pinMode(PIN_SS, OUTPUT);
   SPI.begin();
@@ -146,17 +95,12 @@ void setup()
 }
 //---------------------------------------------------
 void loop()
-{
-      uint16_t a0 = analogRead(A0);
-      output_low = lowByte(a0);
-      output_high = highByte(a0);      
-
-//     output_low = lowByte(sintab2[lookup]);
+{//     output_low = lowByte(sintab2[lookup]);
 //     output_high = highByte(sintab2[lookup]);
       uint16_t val = (output_high << 4) | (output_low >> 4);
 //      uint16_t val = (output_high & 0xFF) << 8 | output_low;
 
-      uint16_t out = (0 << 15) | (0 << 14) | (0 << 13) | (1 << 12) | val;
+      uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | (uint16_t)(val / 8);
      PORTD = B00000000;
 
      SPI.transfer((out & 0xff00) >> 8);
@@ -165,8 +109,8 @@ void loop()
 //    lookup = (lookup + 1) & 511;
 }
 
-//ISR(ADC_vect){
-//  output_low = ADCL;
-//  output_high = ADCH;
-//  ADCSRA |= B01000000;
-//}
+ISR(ADC_vect){
+  output_low = ADCL;
+  output_high = ADCH;
+  ADCSRA |= B01000000;
+}
