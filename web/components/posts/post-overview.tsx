@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import styles from './post-overview.module.css'
+import styles from './PostOverview.module.css'
 
 type Props = {
   title: string,

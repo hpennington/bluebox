@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import styles from './header.module.css'
+import styles from './Header.module.css'
 
 export const Header = () => {
   return (
