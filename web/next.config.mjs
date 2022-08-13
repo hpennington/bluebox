@@ -3,7 +3,10 @@ import nextMDX from '@next/mdx'
 const withMDX = nextMDX({
   // By default only the .mdx extension is supported.
   extension: /\.mdx?$/,
-  options: {providerImportSource: '@mdx-js/react',  /* otherOptions… */}
+  options: {providerImportSource: '@mdx-js/react',  /* otherOptions… */},
+  images: {
+    domains: ['github.com'],
+  },
 })
 
 export default withMDX({
@@ -12,6 +15,4 @@ export default withMDX({
   reactStrictMode: true,
   swcMinify: true,
 })
-
-
 
