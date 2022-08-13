@@ -1,6 +1,12 @@
 import yaml from 'js-yaml'
 import * as fs from 'fs'
 
+interface Header {
+  title: string;
+  overview: string;
+  slug: string;
+}
+
 const headerImport = `
 import {Header} from '../../../components/header/header.tsx'
 import styles from '../Blog.module.css'
@@ -46,7 +52,7 @@ const Blog: NextPage = () => {
 export default Blog
 `
 
-const overviewTemplate = ({title: string, overview: string, slug: string}) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} />`
+const overviewTemplate = (title: string, overview: string, slug: string) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} />`
 
 const main = async () => {
   const dir = '../pages/blog/'
@@ -57,7 +63,7 @@ const main = async () => {
 
   const files = fs.readdirSync(post_dir)
 
-  const overviews = []
+  const overviews: Array<string> = []
 
   for (const file of files) {
     if (file.includes('.mdx')) {
@@ -67,8 +73,8 @@ const main = async () => {
       const output = headerImport.replace('$INJECTION_PLACEHOLDER', markdown)
       fs.writeFileSync(gen_dir + file, output)
 
-      overviews.push(overviewTemplate(frontMatter[0]))
-
+      const row = frontMatter[0] as Header
+      overviews.push(overviewTemplate(row['title'], row['overview'], row['slug']))    
     }
   }
 
