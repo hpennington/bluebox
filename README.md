@@ -1,6 +1,8 @@
 # Bluebox
 A customizable stompbox with bluetooth connection.
 
+![Protoboard](https://github.com/hpennington/bluebox/raw/main/docs/images/protoboard.jpeg)
+
 ## api
 API is the server side code responsible for distributing binaries/kernels and handling database/analytic/notification services.
 
