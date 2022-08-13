@@ -19,7 +19,7 @@ const Blog: NextPage = () => {
         <h1 className={styles.title}>Latest</h1>
         <p className={styles.description}>A blog about the development of a bluetooth guitar pedal. Also covers product & feature announcements.</p>
         
-       <PostOverview title={'PWM DAC vs Discrete DAC'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/PWM-DAC'} tag0={'AVR'} tag1={'SPI'} tag2={'PWM'} date={'Saturday, August 13, 2022'} />
+       <PostOverview title={'PWM DAC vs Discrete DAC'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/PWM_DAC'} tag0={'AVR'} tag1={'SPI'} tag2={'PWM'} date={'Saturday, August 13, 2022'} />
        <PostOverview title={'ADC Overview'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/ADC'} tag0={'AVR'} tag1={'SPI'} tag2={'PWM'} date={'Friday, August 12, 2022'} />
        <PostOverview title={'Effects Processing'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/Processing'} tag0={'AVR'} tag1={'SPI'} tag2={'PWM'} date={'Thursday, August 11, 2022'} />
       </main>

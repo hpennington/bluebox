@@ -1,10 +1,12 @@
 import yaml from 'js-yaml'
 import * as fs from 'fs'
 
-interface Header {
-  title: string;
-  overview: string;
+type Header = {
+  title: string,
+  overview: string,
   slug: string;
+  date: string,
+  tags: Array<string>,
 }
 
 const headerImport = `
@@ -52,7 +54,7 @@ const Blog: NextPage = () => {
 export default Blog
 `
 
-const overviewTemplate = (title: string, overview: string, slug: string, date: string, tags: Array<string>) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} tag0={'${tags[0]}'} tag1={'${tags[1]}'} tag2={'${tags[2]}'} date={'${date}'} />`
+const overviewTemplate = (title: string, overview: string, slug: string, date: string, tag0: string, tag1: string, tag2: string) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} tag0={'${tag0}'} tag1={'${tag1}'} tag2={'${tag2}'} date={'${date}'} />`
 
 const main = async () => {
   const dir = '../pages/blog/'
@@ -82,10 +84,10 @@ const main = async () => {
     }
   }
   
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-  for (const overview of overviews.sort((a: Header, b: Header) => b.date - a.date)) {
-    overviewsString.push(overviewTemplate(overview['title'], overview['overview'], overview['slug'], new String(new Date(overview['date']).toLocaleDateString('en-us', options)), overview['tags']))    
+  for (const overview of overviews.sort((a: Header, b: Header) => new Date(b.date).getTime()- (new Date(a.date).getTime()))) {
+    overviewsString.push(overviewTemplate(overview['title'], overview['overview'], overview['slug'], new Date(overview['date']).toLocaleDateString('en-us', options), overview['tags'][0], overview['tags'][1], overview['tags'][2]))    
   }
 
   const overviewString = overviewsString.reduce((prev: string, curr: string) => prev + '\n' + curr, '')
