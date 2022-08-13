@@ -83,7 +83,8 @@ void setup()
 //  Serial.begin(115200);
   // setup ADC
   ADMUX = 0x60; // left adjust, adc0, internal vcc
-  ADCSRA = 0xe5; // turn on adc, ck/32, auto trigger
+  ADCSRA = 0xe0; // turn on adc, auto trigger
+  // Set ADC clock prescalar to 128 // 16000000 / 128 / 13 (clock cylcles per conversion) = ~9600sps
   ADCSRA |= (1 << ADPS2) | (1 << ADPS1) & (1 << ADPS0);
   DIDR0 = 0x01; // turn off digital inputs for adc0
   ADCSRA |= B00001000;
@@ -95,12 +96,13 @@ void setup()
 }
 //---------------------------------------------------
 void loop()
-{//     output_low = lowByte(sintab2[lookup]);
+{
+//     output_low = lowByte(sintab2[lookup]);
 //     output_high = highByte(sintab2[lookup]);
-      uint16_t val = (output_high << 4) | (output_low >> 4);
+     uint16_t val = (output_high << 4) | (output_low >> 4);
 //      uint16_t val = (output_high & 0xFF) << 8 | output_low;
 
-      uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | (uint16_t)(val / 8);
+     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
      PORTD = B00000000;
 
      SPI.transfer((out & 0xff00) >> 8);
