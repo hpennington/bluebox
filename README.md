@@ -1,4 +1,4 @@
-# Bluebox
+# Bluebox (Work in progress)
 A customizable stompbox with bluetooth connection.
 
 ![Protoboard](https://github.com/hpennington/bluebox/raw/main/docs/images/protoboard.jpeg)
