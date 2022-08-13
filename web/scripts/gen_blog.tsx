@@ -46,7 +46,7 @@ const Blog: NextPage = () => {
 export default Blog
 `
 
-const overviewTemplate = ({title, overview, slug}) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} />`
+const overviewTemplate = ({title: string, overview: string, slug: string}) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} />`
 
 const main = async () => {
   const dir = '../pages/blog/'
