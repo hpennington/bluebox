@@ -52,7 +52,7 @@ const Blog: NextPage = () => {
 export default Blog
 `
 
-const overviewTemplate = (title: string, overview: string, slug: string) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} />`
+const overviewTemplate = (title: string, overview: string, slug: string, date: string, tags: Array<string>) => `       <PostOverview title={'${title}'} overview={'${overview}'} slug={'blog/posts/${slug}'} tag0={'${tags[0]}'} tag1={'${tags[1]}'} tag2={'${tags[2]}'} date={'${date}'} />`
 
 const main = async () => {
   const dir = '../pages/blog/'
@@ -63,7 +63,9 @@ const main = async () => {
 
   const files = fs.readdirSync(post_dir)
 
-  const overviews: Array<string> = []
+  const overviews: Array<Header> = []
+
+  const overviewsString: Array<string> = []
 
   for (const file of files) {
     if (file.includes('.mdx')) {
@@ -74,11 +76,19 @@ const main = async () => {
       fs.writeFileSync(gen_dir + file, output)
 
       const row = frontMatter[0] as Header
-      overviews.push(overviewTemplate(row['title'], row['overview'], row['slug']))    
+      
+      overviews.push(row)
+      
     }
   }
+  
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-  const overviewString = overviews.reduce((prev: string, curr: string) => prev + '\n' + curr, '')
+  for (const overview of overviews.sort((a: Header, b: Header) => b.date - a.date)) {
+    overviewsString.push(overviewTemplate(overview['title'], overview['overview'], overview['slug'], new String(new Date(overview['date']).toLocaleDateString('en-us', options)), overview['tags']))    
+  }
+
+  const overviewString = overviewsString.reduce((prev: string, curr: string) => prev + '\n' + curr, '')
   const blog = blogTemplate.replace('$INJECTION_PLACEHOLDER', overviewString)
   fs.writeFileSync('../pages/blog/index.tsx', blog)
 
