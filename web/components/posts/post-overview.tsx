@@ -1,15 +1,24 @@
+import Link from 'next/link'
 import styles from './post-overview.module.css'
 
-export const PostOverview = () => (
+type Props = {
+  title: string,
+  overview: string,
+  slug: string,
+}
+
+export const PostOverview = ({title, overview, slug}: Props) => (
   <div className={styles.container}>
     <p className={styles.date}>August 7, 2021</p>
-    <a href="" className={styles.majorLink}>New features in v1</a>
+    <span className={styles.majorLink}>
+      <Link href={"/" + slug}>{title}</Link>
+    </span>
     <div className={styles.linkContainer}>
-      <a href="">NEXT-JS</a>
-      <a href="">TAILWIND</a>
-      <a href="">GUIDE</a>
+      <Link href={"/" + slug}>NEXT-JS</Link>
+      <Link href={"/" + slug}>TAILWIND</Link>
+      <Link href={"/" + slug}>GUIDE</Link>
     </div>
-    <p>An overview of the new features released in v1 - code block copy, multiple authors, frontmatter layout and more</p>
-    <a href="">Read more</a>
+    <p>{overview}</p>
+    <Link href={"/" + slug}>Read more</Link>
   </div>
 )

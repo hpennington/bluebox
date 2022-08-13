@@ -1,3 +1,4 @@
+
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -17,16 +18,10 @@ const Blog: NextPage = () => {
         <Header />
         <h1 className={styles.title}>Latest</h1>
         <p className={styles.description}>A blog about the development of a bluetooth guitar pedal. Also covers product & feature announcements.</p>
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
-        <PostOverview />
+        
+       <PostOverview title={'Markdown Rules'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/post1'} />
+       <PostOverview title={'Markdown Rules'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/post2'} />
+       <PostOverview title={'Markdown Rules'} overview={'This is an overview of the blog post you are previewing.'} slug={'blog/posts/post3'} />
       </main>
 
       <footer className={styles.footer}>
