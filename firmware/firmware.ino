@@ -7,7 +7,6 @@ Bluetooth bluetooth;
 int lookup = 0;
 volatile uint8_t output_low = 0;
 volatile uint8_t output_high = 0;
-volatile bool sendHighByte = true;
 volatile bool inTransaction = false;
 volatile bool lastByte = false;
 bool isInitial = true;
@@ -124,7 +123,7 @@ bool finished_writing_SPI() {
 void transfer(uint8_t data) {
     SPDR = data;
 }
-//---------------------------------------------------
+
 void loop() {
     uint8_t data_length = Bluetooth_read(&bluetooth);
     print_data(data_length);
