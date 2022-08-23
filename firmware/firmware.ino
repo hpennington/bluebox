@@ -1,12 +1,16 @@
 #include <SPI.h>
+#include "bluetooth.h"
 
-//Sinewave Tables were generated using this calculator:
-//http://www.daycounter.com/Calculators/Sine-Generator-Calculator.phtml
+float parsefloat(uint8_t *buffer);
 
-
+Bluetooth bluetooth;
 int lookup = 0;
 volatile uint8_t output_low = 0;
 volatile uint8_t output_high = 0;
+volatile bool sendHighByte = true;
+volatile bool inTransaction = false;
+volatile bool lastByte = false;
+bool isInitial = true;
 const int PIN_SS = 4;
 
 int sintab2[512] = 
@@ -77,10 +81,33 @@ int sintab2[512] =
   1847, 1872, 1897, 1922, 1948, 1973, 1998, 2023
 };
 
-void setup()
-{
+void print_data(uint8_t data_length) {
+  if (data_length == 0) return;
+  
+  // Accelerometer
+  if (bluetooth.buffer[1] == 'A') {
+    float x, y, z;
+    x = parsefloat(bluetooth.buffer+2);
+    y = parsefloat(bluetooth.buffer+6);
+    z = parsefloat(bluetooth.buffer+10);
+    Serial.print("Accel\t");
+    Serial.print(x); Serial.print('\t');
+    Serial.print(y); Serial.print('\t');
+    Serial.print(z); Serial.println();
+  }
+}
 
-//  Serial.begin(115200);
+void setup() {
+  pinMode(PIN_SS, OUTPUT);
+  Serial.begin(115200);
+
+//  Bluetooth_init(&bluetooth);
+  
+  SPI.begin();
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+  
+  Serial.println("Finished INIT");
+
   // setup ADC
   ADMUX = 0x60; // left adjust, adc0, internal vcc
   ADCSRA = 0xe0; // turn on adc, auto trigger
@@ -88,31 +115,85 @@ void setup()
   ADCSRA |= (1 << ADPS2) | (1 << ADPS1) & (1 << ADPS0);
   DIDR0 = 0x01; // turn off digital inputs for adc0
   ADCSRA |= B00001000;
-
-  pinMode(PIN_SS, OUTPUT);
-  SPI.begin();
-  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   
 }
-//---------------------------------------------------
-void loop()
-{
-//     output_low = lowByte(sintab2[lookup]);
-//     output_high = highByte(sintab2[lookup]);
-     uint16_t val = (output_high << 4) | (output_low >> 4);
-//      uint16_t val = (output_high & 0xFF) << 8 | output_low;
 
-     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
-     PORTD = B00000000;
-
-     SPI.transfer((out & 0xff00) >> 8);
-     SPI.transfer(out & 0xff);
-     PORTD = B11111111;
-//    lookup = (lookup + 1) & 511;
+bool finished_writing_SPI() {
+  return (SPSR & _BV(SPIF));
 }
 
-ISR(ADC_vect){
-  output_low = ADCL;
-  output_high = ADCH;
-  ADCSRA |= B01000000;
+void transfer(uint8_t data) {
+    SPDR = data;
+}
+//---------------------------------------------------
+void loop() {
+//    uint8_t data_length = Bluetooth_read(&bluetooth);
+//    print_data(data_length);
+
+    uint16_t val = (output_high << 4) | (output_low >> 4);
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
+
+    PORTD &= ~(1 << PD4);
+    SPI.transfer16(out);
+    PORTD |= (1 << PD4);
+
+// uint16_t val = (output_high << 4) | (output_low >> 4);
+//    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
+//
+//    if (!inTransaction && finished_writing_SPI() == true) {
+////        Serial.println("1st");
+//        PORTD &= ~(1 << PD4);
+//        inTransaction = true;
+//        isInitial = false;
+//        transfer((out & 0xff00) >> 8);
+//    } else if (isInitial == true) {
+////      Serial.println("2nd");
+//        PORTD &= ~(1 << PD4);
+//        inTransaction = true;
+//        isInitial = false;
+//        transfer((out & 0xff00) >> 8);
+//    } else if (inTransaction && finished_writing_SPI() == true && lastByte == false) {
+////        Serial.println("3rd");
+//        transfer(out & 0xff);
+//        lastByte = true;
+//    } else if (inTransaction == true && lastByte == true && finished_writing_SPI() == true) {
+////        Serial.println("4th");
+//        PORTD |= (1 << PD4);
+//        inTransaction = false;
+//        lastByte = false;
+//    }
+
+}
+
+ISR(ADC_vect) {
+    output_low = ADCL;
+    output_high = ADCH;
+//    Serial.println("HERE");
+//    uint16_t val = (output_high << 4) | (output_low >> 4);
+//    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
+//
+//    if (!inTransaction && finished_writing_SPI() == true) {
+////        Serial.println("1st");
+//        PORTD &= ~(1 << PD4);
+//        inTransaction = true;
+//        isInitial = false;
+//        transfer((out & 0xff00) >> 8);
+//    } else if (isInitial == true) {
+////      Serial.println("2nd");
+//        PORTD &= ~(1 << PD4);
+//        inTransaction = true;
+//        isInitial = false;
+//        transfer((out & 0xff00) >> 8);
+//    } else if (inTransaction && finished_writing_SPI() == true && lastByte == false) {
+////        Serial.println("3rd");
+//        transfer(out & 0xff);
+//        lastByte = true;
+//    } else if (inTransaction == true && lastByte == true && finished_writing_SPI() == true) {
+////        Serial.println("4th");
+//        PORTD |= (1 << PD4);
+//        inTransaction = false;
+//        lastByte = false;
+//    }
+
+    ADCSRA |= B01000000;
 }

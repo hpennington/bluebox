@@ -1,0 +1,56 @@
+//
+//  main.c
+//
+//  Created by Hayden Pennington on 8-15-22
+//
+
+#include <stdio.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define PIN_SS PD4
+
+volatile uint8_t output_low = 0;
+volatile uint8_t output_high = 0;
+
+ISR(ADC_vect){
+    output_low = ADCL;
+    output_high = ADCH;
+    ADCSRA |= 0x01000000;
+}
+
+void setup() {
+    // setup ADC
+    ADMUX = 0x60; // left adjust, adc0, internal vcc
+    ADCSRA = 0xe0; // turn on adc, auto trigger
+    // Set ADC clock prescalar to 128 // 16000000 / 128 / 13 (clock cylcles per conversion) = ~9600sps
+    ADCSRA |= (1 << ADPS2) | (1 << ADPS1) & (1 << ADPS0);
+    DIDR0 = 0x01; // turn off digital inputs for adc0
+    ADCSRA |= 0x00001000;
+
+    // Initialize PD4 for holding the reset on MCP4921
+    DDRD |= (1 << PIN_SS);
+    // SPI.begin();
+    // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+}
+
+void run() {
+    uint16_t val = (output_high << 4) | (output_low >> 4);
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
+    
+    PORTD = 0x00000000; // Hold reset low on MCP4921
+    // SPI.transfer((out & 0xff00) >> 8);
+    _delay_ms(50);
+    // SPI.transfer(out & 0xff);
+    PORTD = 0x11111111; // Set reset high on MCP4921
+}
+
+int main() __attribute__((noreturn));
+int main() {
+
+    setup();
+
+    while(1) {
+        run();
+    }
+}
