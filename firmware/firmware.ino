@@ -128,67 +128,32 @@ void transfer(uint8_t data) {
 void loop() {
     uint8_t data_length = Bluetooth_read(&bluetooth);
     print_data(data_length);
-
-//    uint16_t val = (output_high << 4) | (output_low >> 4);
-//    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
-
-//    PORTD &= ~(1 << PD4);
-//    SPI.transfer16(out);
-//    PORTD |= (1 << PD4);
-
-//    uint16_t val = (output_high << 4) | (output_low >> 4);
-//    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
-//
-//    if (!inTransaction && finished_writing_SPI() == true) {
-////        Serial.println("1st");
-//        PORTD &= ~(1 << PD4);
-//        inTransaction = true;
-//        isInitial = false;
-//        transfer((out & 0xff00) >> 8);
-//    } else if (isInitial == true) {
-////      Serial.println("2nd");
-//        PORTD &= ~(1 << PD4);
-//        inTransaction = true;
-//        isInitial = false;
-//        transfer((out & 0xff00) >> 8);
-//    } else if (inTransaction && finished_writing_SPI() == true && lastByte == false) {
-////        Serial.println("3rd");
-//        transfer(out & 0xff);
-//        lastByte = true;
-//    } else if (inTransaction == true && lastByte == true && finished_writing_SPI() == true) {
-////        Serial.println("4th");
-//        PORTD |= (1 << PD4);
-//        inTransaction = false;
-//        lastByte = false;
-//    }
-
 }
 
 ISR(ADC_vect) {
-    output_low = ADCL;
-    output_high = ADCH;
-//    Serial.println("HERE");
+
+    if (!inTransaction) {
+        output_low = ADCL;
+        output_high = ADCH;
+    }
+  
     uint16_t val = (output_high << 4) | (output_low >> 4);
     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | val;
-
+    
     if (!inTransaction && finished_writing_SPI() == true) {
-//        Serial.println("1st");
         PORTD &= ~(1 << PD4);
         inTransaction = true;
         isInitial = false;
         transfer((out & 0xff00) >> 8);
     } else if (isInitial == true) {
-//      Serial.println("2nd");
         PORTD &= ~(1 << PD4);
         inTransaction = true;
         isInitial = false;
         transfer((out & 0xff00) >> 8);
     } else if (inTransaction && finished_writing_SPI() == true && lastByte == false) {
-//        Serial.println("3rd");
         transfer(out & 0xff);
         lastByte = true;
     } else if (inTransaction == true && lastByte == true && finished_writing_SPI() == true) {
-//        Serial.println("4th");
         PORTD |= (1 << PD4);
         inTransaction = false;
         lastByte = false;
