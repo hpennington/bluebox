@@ -53,11 +53,10 @@ void transfer(uint8_t data) {
 void setup() {
     setup_serial();
     setup_spi();
+    begin_spi();
     
     Bluetooth_init(&bluetooth);
 
-    begin_spi();
-    
     ADCUnit_init(&adc);
     ADCUnit_start(&adc);
 }
