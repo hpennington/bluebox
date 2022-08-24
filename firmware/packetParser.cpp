@@ -9,7 +9,7 @@
 #include "Adafruit_BluefruitLE_SPI.h"
 #include "Adafruit_BluefruitLE_UART.h"
 #include "bluetooth.h"
-
+#include "packetParser.h"
 
 #define PACKET_ACC_LEN                  (15)
 #define PACKET_GYRO_LEN                 (15)

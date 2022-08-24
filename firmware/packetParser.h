@@ -1,0 +1,1 @@
+float parsefloat(uint8_t *buffer);
