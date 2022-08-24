@@ -4,6 +4,7 @@ typedef struct SPIUnit {
     volatile uint16_t value;
     volatile bool is_transacting;
     volatile bool is_last_byte;
+    bool is_initial;
 } SPIUnit;
 
 void SPIUnit_setup(SPIUnit *spi);

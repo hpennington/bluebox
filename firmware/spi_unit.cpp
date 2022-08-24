@@ -16,6 +16,7 @@ void SPIUnit_setup(SPIUnit *spi) {
     pinMode(PIN_SS, OUTPUT);
     spi->is_transacting = false;
     spi->is_last_byte = false;
+    spi->is_initial = true;
     spi->value = 0;
 }
 
