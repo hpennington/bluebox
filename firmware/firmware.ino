@@ -3,6 +3,8 @@
 #include "spi_unit.h"
 #include "packetParser.h"
 #include "sintab2.h"
+#include<avr/io.h>
+#include<avr/interrupt.h>
 
 Bluetooth bluetooth;
 ADCUnit adc;
@@ -36,6 +38,13 @@ void setup_serial() {
   Serial.begin(115200);
 }
 
+void setup_spi_timer() {
+    TCCR1A = (1<<CS10) | (1<<CS12); //set the pre-scalar as 1024
+    OCR1A = 32768;
+    TCNT1 = 0;
+    TIMSK1 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
+}
+
 void setup() {
     setup_serial();
     
@@ -46,6 +55,10 @@ void setup() {
 
     ADCUnit_init(&adc);
     ADCUnit_start(&adc);
+
+    setup_spi_timer();
+    
+    sei();
 }
 
 void loop() {
@@ -53,11 +66,7 @@ void loop() {
     print_data(data_length);
 }
 
-ISR(ADC_vect) {
-    if (!spi.is_transacting) {
-        ADCUnit_update(&adc);
-    }
-    
+ISR(TIMER1_OVF_vect) {
     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value;
     
     if (!spi.is_transacting && finished_writing_SPI() == true) {
@@ -77,6 +86,14 @@ ISR(ADC_vect) {
         PORTD |= (1 << PD4);
         spi.is_transacting = false;
         spi.is_last_byte = false;
+    }
+    
+    TCNT1 = 0;
+}
+
+ISR(ADC_vect) {
+    if (!spi.is_transacting) {
+        ADCUnit_update(&adc);
     }
     
     ADCSRA |= B01000000;
