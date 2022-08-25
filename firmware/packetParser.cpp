@@ -124,8 +124,10 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
   // Throw an error message if the checksum's don't match
   if (xsum != checksum)
   {
+#ifdef SERIAL_PRINT_ON
     Serial.print("Checksum mismatch in packet : ");
     printHex(bluetooth->buffer, replyidx+1);
+#endif
     return 0;
   }
   

@@ -6,6 +6,8 @@
 #include<avr/io.h>
 #include<avr/interrupt.h>
 
+#define SERIAL_PRINT_ON
+
 Bluetooth bluetooth;
 ADCUnit adc;
 SPIUnit spi;
@@ -35,7 +37,9 @@ void transfer(uint8_t data) {
 }
 
 void setup_serial() {
+#ifdef SERIAL_PRINT_ON
   Serial.begin(115200);
+#endif
 }
 
 void setup_spi_timer() {
@@ -63,12 +67,14 @@ void setup() {
 
 void loop() {
     uint8_t data_length = Bluetooth_read(&bluetooth);
+#ifdef SERIAL_PRINT_ON
     print_data(data_length);
+#endif
 }
 
 ISR(TIMER1_OVF_vect) {
     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value;
-    
+
     if (!spi.is_transacting && finished_writing_SPI() == true) {
         PORTD &= ~(1 << PD4);
         spi.is_transacting = true;
