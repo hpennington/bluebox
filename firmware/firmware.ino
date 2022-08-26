@@ -7,7 +7,6 @@
 #include "sintab2.h"
 
 #define SERIAL_PRINT_ON
-#define FUZZ_1
 
 Bluetooth bluetooth;
 ADCUnit adc;
@@ -73,7 +72,6 @@ void loop() {
 #endif
 }
 
-#ifdef FUZZ_1
 uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
     if (value >= min_value && value <= max_value) {
       return value;
@@ -87,19 +85,29 @@ uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
 volatile uint16_t min_value = 4095;
 volatile uint16_t max_value = 0;
 volatile uint16_t t = 0;
-#endif
 
-ISR(TIMER1_OVF_vect) {
-#ifdef FUZZ_1
-    if (adc.value > max_value) {
-      max_value = adc.value;
-    } else if (adc.value < min_value) {
-      min_value = adc.value;
+const int n_kernels = 2;
+
+int kernels[n_kernels] = {
+    1,
+    0
+};
+
+bool kernels_on[n_kernels] = {
+    false,
+    false
+};
+
+uint16_t fuzz(uint16_t value) {
+    if (value > max_value) {
+      max_value = value;
+    } else if (value < min_value) {
+      min_value = value;
     }
 
     uint16_t half_point = min_value + ((max_value - min_value) / 2);
     
-    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | clip(adc.value, half_point - 125, half_point + 125); 
+    value = clip(adc.value, half_point - 200, half_point + 200); 
 
     if (t == 6500) {
         min_value = half_point;
@@ -108,9 +116,37 @@ ISR(TIMER1_OVF_vect) {
     }
 
     t += 1;
-#else
-    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
-#endif
+
+    return value;
+}
+
+uint16_t tremolo(uint16_t value) {
+    return value;
+}
+
+uint16_t render(uint16_t value) {
+    for (int i = 0; i < n_kernels; i += 1) {
+        int kernel_id = kernels[i];
+
+        switch(kernel_id) {
+            case 0:
+                if (kernels_on[i] == true) {
+                    value = fuzz(value);  
+                }
+                break;
+             case 1:
+                if (kernels_on[i] == true) {
+                    value = tremolo(value);  
+                }
+                break;
+        }
+    }
+
+    return value;
+}
+
+ISR(TIMER1_OVF_vect) {
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | render(adc.value); 
 
     if (!spi.is_transacting && finished_writing_SPI() == true) {
         PORTD &= ~(1 << PD4);
