@@ -1,12 +1,13 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include "bluetooth.h"
 #include "adc_unit.h"
 #include "spi_unit.h"
 #include "packetParser.h"
 #include "sintab2.h"
-#include<avr/io.h>
-#include<avr/interrupt.h>
 
 #define SERIAL_PRINT_ON
+#define FUZZ_1
 
 Bluetooth bluetooth;
 ADCUnit adc;
@@ -72,8 +73,44 @@ void loop() {
 #endif
 }
 
+#ifdef FUZZ_1
+uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
+    if (value >= min_value && value <= max_value) {
+      return value;
+    } else if (value < min_value) {
+      return min_value;
+    } else {
+      return max_value;
+    }
+}
+
+volatile uint16_t min_value = 4095;
+volatile uint16_t max_value = 0;
+volatile uint16_t t = 0;
+#endif
+
 ISR(TIMER1_OVF_vect) {
-    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value;
+#ifdef FUZZ_1
+    if (adc.value > max_value) {
+      max_value = adc.value;
+    } else if (adc.value < min_value) {
+      min_value = adc.value;
+    }
+
+    uint16_t half_point = min_value + ((max_value - min_value) / 2);
+    
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | clip(adc.value, half_point - 125, half_point + 125); 
+
+    if (t == 6500) {
+        min_value = half_point;
+        max_value = half_point;
+        t = 0;
+    }
+
+    t += 1;
+#else
+   uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
+#endif
 
     if (!spi.is_transacting && finished_writing_SPI() == true) {
         PORTD &= ~(1 << PD4);
