@@ -39,7 +39,7 @@ void transfer(uint8_t data) {
 
 void setup_serial() {
 #ifdef SERIAL_PRINT_ON
-  Serial.begin(115200);
+    Serial.begin(115200);
 #endif
 }
 
@@ -109,7 +109,7 @@ ISR(TIMER1_OVF_vect) {
 
     t += 1;
 #else
-   uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
 #endif
 
     if (!spi.is_transacting && finished_writing_SPI() == true) {
