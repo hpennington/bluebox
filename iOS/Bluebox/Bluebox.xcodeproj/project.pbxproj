@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F870310528BA9B0E00BD2FA1 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870310428BA9B0E00BD2FA1 /* BluetoothManager.swift */; };
+		F870310628BA9B0E00BD2FA1 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870310428BA9B0E00BD2FA1 /* BluetoothManager.swift */; };
 		F8E1A72828A4DF510016AD5E /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E1A72728A4DF510016AD5E /* Tests_iOS.swift */; };
 		F8E1A72A28A4DF510016AD5E /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E1A72928A4DF510016AD5E /* Tests_iOSLaunchTests.swift */; };
 		F8E1A73428A4DF510016AD5E /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E1A73328A4DF510016AD5E /* Tests_macOS.swift */; };
@@ -37,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F870310428BA9B0E00BD2FA1 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
 		F8E1A70F28A4DF4E0016AD5E /* BlueboxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueboxApp.swift; sourceTree = "<group>"; };
 		F8E1A71028A4DF4E0016AD5E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8E1A71128A4DF510016AD5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 			children = (
 				F8E1A70F28A4DF4E0016AD5E /* BlueboxApp.swift */,
 				F8E1A71028A4DF4E0016AD5E /* ContentView.swift */,
+				F870310428BA9B0E00BD2FA1 /* BluetoothManager.swift */,
 				F8E1A71128A4DF510016AD5E /* Assets.xcassets */,
 			);
 			path = Shared;
@@ -308,6 +312,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8E1A73928A4DF510016AD5E /* ContentView.swift in Sources */,
+				F870310528BA9B0E00BD2FA1 /* BluetoothManager.swift in Sources */,
 				F8E1A73728A4DF510016AD5E /* BlueboxApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -317,6 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8E1A73A28A4DF510016AD5E /* ContentView.swift in Sources */,
+				F870310628BA9B0E00BD2FA1 /* BluetoothManager.swift in Sources */,
 				F8E1A73828A4DF510016AD5E /* BlueboxApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -474,6 +480,8 @@
 				DEVELOPMENT_TEAM = 3EZ5UQTGVP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Scan for Bluebox device";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Scan for Bluebox device";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -504,6 +512,8 @@
 				DEVELOPMENT_TEAM = 3EZ5UQTGVP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Scan for Bluebox device";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Scan for Bluebox device";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
