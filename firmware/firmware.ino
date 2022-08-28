@@ -6,7 +6,7 @@
 #include "packetParser.h"
 #include "sintab2.h"
 
-#define SERIAL_PRINT_ON
+#define SERIAL_PRINT_ON true
 
 Bluetooth bluetooth;
 ADCUnit adc;
@@ -17,10 +17,10 @@ void print_data(uint8_t data_length) {
     
     // Accelerometer
     if (bluetooth.buffer[1] == 'A') {
-        float x, y, z;
+        uint8_t x, y, z;
         x = parsefloat(bluetooth.buffer+2);
-        y = parsefloat(bluetooth.buffer+6);
-        z = parsefloat(bluetooth.buffer+10);
+        y = parsefloat(bluetooth.buffer+3);
+        z = parsefloat(bluetooth.buffer+4);
         Serial.print("Accel\t");
         Serial.print(x); Serial.print('\t');
         Serial.print(y); Serial.print('\t');

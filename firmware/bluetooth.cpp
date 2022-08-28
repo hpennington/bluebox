@@ -3,7 +3,7 @@
 #include "bluetooth.h"
 
 uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout);
-
+#define SERIAL_PRINT_ON
 void Bluetooth_init(Bluetooth *bluetooth) {
 #ifdef SERIAL_PRINT_ON
   Serial.println(F("Adafruit Bluefruit App Controller Example"));

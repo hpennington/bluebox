@@ -19,6 +19,8 @@
 #define PACKET_COLOR_LEN                (6)
 #define PACKET_LOCATION_LEN             (15)
 
+#define SERIAL_PRINT_ON;
+
 /**************************************************************************/
 /*!
     @brief  Casts the four bytes at the specified address to a float
@@ -26,8 +28,8 @@
 /**************************************************************************/
 float parsefloat(uint8_t *buffer) 
 {
-  float f;
-  memcpy(&f, buffer, 4);
+  uint8_t f;
+  memcpy(&f, buffer, 1);
   return f;
 }
 
@@ -70,13 +72,14 @@ void printHex(const uint8_t * data, const uint32_t numBytes)
 /**************************************************************************/
 uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout) 
 {
+  
   uint16_t origtimeout = timeout, replyidx = 0;
 
   memset(bluetooth->buffer, 0, READ_BUFSIZE);
 
   while (timeout--) {
     if (replyidx >= 20) break;
-    if ((bluetooth->buffer[1] == 'A') && (replyidx == PACKET_ACC_LEN))
+    if ((bluetooth->buffer[1] == 'A') && (replyidx > 1))
       break;
     if ((bluetooth->buffer[1] == 'G') && (replyidx == PACKET_GYRO_LEN))
       break;
@@ -93,6 +96,7 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
       
     while (ble->available()) {
       char c =  ble->read();
+//      Serial.println(c);
       if (c == '!') {
         replyidx = 0;
       }
@@ -104,13 +108,17 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
     if (timeout == 0) break;
     delay(1);
   }
-
+ 
   bluetooth->buffer[replyidx] = 0;  // null term
 
-  if (!replyidx)  // no data or timeout 
+  if (!replyidx) { // no data or timeout 
+    Serial.println("No data or timeout");
     return 0;
-  if (bluetooth->buffer[0] != '!')  // doesn't start with '!' packet beginning
+  }
+  if (bluetooth->buffer[0] != '!') { // doesn't start with '!' packet beginning
+    Serial.println("doesnt start with !");
     return 0;
+  }
   
   // check checksum!
   uint8_t xsum = 0;
@@ -122,15 +130,17 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
   xsum = ~xsum;
 
   // Throw an error message if the checksum's don't match
-  if (xsum != checksum)
-  {
-#ifdef SERIAL_PRINT_ON
-    Serial.print("Checksum mismatch in packet : ");
-    printHex(bluetooth->buffer, replyidx+1);
-#endif
-    return 0;
-  }
+//  if (xsum != checksum)
+//  {
+//#ifdef SERIAL_PRINT_ON
+//    Serial.print("Checksum mismatch in packet : ");
+//    printHex(bluetooth->buffer, replyidx+1);
+//#endif
+//    return 0;
+//  }
   
   // checksum passed!
+
+  Serial.println(replyidx);
   return replyidx;
 }
