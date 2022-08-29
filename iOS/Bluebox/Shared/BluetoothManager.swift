@@ -10,12 +10,22 @@ import CoreBluetooth
 
 let serviceUUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 
+enum BlueboxCommand: UInt8 {
+    case noEffect = 1
+    case fuzz
+    case tremolo
+    case all
+}
+
 class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     @Published var isConnected = false
+    @Published var isFuzzOn = false
+    @Published var isTremoloOn = false
     
-    var centralManager: CBCentralManager!
-    var discoveredPeripheral: CBPeripheral?
-    var discoveredCharacteristic: CBCharacteristic?
+    private var command: BlueboxCommand = .noEffect
+    private var centralManager: CBCentralManager!
+    private var discoveredPeripheral: CBPeripheral?
+    private var discoveredCharacteristic: CBCharacteristic?
     
     override init() {
         super.init()
@@ -95,20 +105,19 @@ class BluetoothManager: NSObject, ObservableObject, CBCentralManagerDelegate, CB
             return
         }
         
-        discoveredCharacteristic = characteristics.first!
-        Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.writeData), userInfo: nil, repeats: true)
+        if let characteristic = characteristics.first {
+            discoveredCharacteristic = characteristic
+        }
+//        Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.writeData), userInfo: nil, repeats: true)
 //        let timer = Timer(fireAt: .now, interval: 1, target: self, selector: #selector(), userInfo: nil, repeats: true)
     }
     
-    @objc func writeData() {
-        if var data = "!A".data(using: .utf8) {
-            data.append(22)
-            data.append(42)
-            data.append(100)
+    func writeData(command: BlueboxCommand) {
+        if var data = "!A".data(using: .utf8), let peripheral = discoveredPeripheral, let discoveredCharacteristic = discoveredCharacteristic {
+            data.append(command.rawValue)
             print("writing value")
-            discoveredPeripheral!.writeValue(data, for: discoveredCharacteristic!, type: .withoutResponse)
+            peripheral.writeValue(data, for: discoveredCharacteristic, type: .withoutResponse)
         }
-    
     }
     
 //    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {

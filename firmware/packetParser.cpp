@@ -96,7 +96,6 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
       
     while (ble->available()) {
       char c =  ble->read();
-//      Serial.println(c);
       if (c == '!') {
         replyidx = 0;
       }
@@ -112,11 +111,11 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
   bluetooth->buffer[replyidx] = 0;  // null term
 
   if (!replyidx) { // no data or timeout 
-    Serial.println("No data or timeout");
+//    Serial.println("No data or timeout");
     return 0;
   }
   if (bluetooth->buffer[0] != '!') { // doesn't start with '!' packet beginning
-    Serial.println("doesnt start with !");
+//    Serial.println("doesnt start with !");
     return 0;
   }
   
@@ -140,7 +139,5 @@ uint8_t readPacket(Bluetooth *bluetooth, Adafruit_BLE *ble, uint16_t timeout)
 //  }
   
   // checksum passed!
-
-  Serial.println(replyidx);
   return replyidx;
 }

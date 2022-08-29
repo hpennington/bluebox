@@ -17,14 +17,8 @@ void print_data(uint8_t data_length) {
     
     // Accelerometer
     if (bluetooth.buffer[1] == 'A') {
-        uint8_t x, y, z;
-        x = parsefloat(bluetooth.buffer+2);
-        y = parsefloat(bluetooth.buffer+3);
-        z = parsefloat(bluetooth.buffer+4);
-        Serial.print("Accel\t");
-        Serial.print(x); Serial.print('\t');
-        Serial.print(y); Serial.print('\t');
-        Serial.print(z); Serial.println();
+        uint8_t x = parsefloat(bluetooth.buffer+2);
+        Serial.println(x);
     }
 }
 
@@ -49,6 +43,22 @@ void setup_spi_timer() {
     TIMSK1 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
 }
 
+volatile uint16_t min_value = 4095;
+volatile uint16_t max_value = 0;
+volatile uint16_t t = 0;
+
+const int n_kernels = 2;
+
+int kernels[n_kernels] = {
+    1,
+    0
+};
+
+bool kernels_on[n_kernels] = {
+    false,
+    false
+};
+
 void setup() {
     setup_serial();
     
@@ -70,6 +80,28 @@ void loop() {
 #ifdef SERIAL_PRINT_ON
     print_data(data_length);
 #endif
+
+    if (data_length > 0) {
+        uint8_t command = bluetooth.buffer[2];
+        switch(command) {
+            case 1:
+                kernels_on[0] = false;
+                kernels_on[1] = false;
+                break;
+            case 2:
+                kernels_on[0] = false;
+                kernels_on[1] = true;
+                break;
+            case 3:
+                kernels_on[0] = true;
+                kernels_on[1] = false;
+                break;
+            case 4:
+                kernels_on[0] = true;
+                kernels_on[1] = true;
+                break;
+        }
+    }
 }
 
 uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
@@ -81,22 +113,6 @@ uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
       return max_value;
     }
 }
-
-volatile uint16_t min_value = 4095;
-volatile uint16_t max_value = 0;
-volatile uint16_t t = 0;
-
-const int n_kernels = 2;
-
-int kernels[n_kernels] = {
-    1,
-    0
-};
-
-bool kernels_on[n_kernels] = {
-    false,
-    false
-};
 
 uint16_t fuzz(uint16_t value) {
     if (value > max_value) {
@@ -134,7 +150,7 @@ uint16_t render(uint16_t value) {
                     value = fuzz(value);  
                 }
                 break;
-             case 1:
+            case 1:
                 if (kernels_on[i] == true) {
                     value = tremolo(value);  
                 }

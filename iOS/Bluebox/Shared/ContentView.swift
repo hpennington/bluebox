@@ -6,11 +6,16 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
-    @State private var isFuzzOn = false
-    @State private var isTremoloOn = false
     @StateObject private var bluetoothManager = BluetoothManager()
+    
+    @State private var prevOutput = (false, false)
+    
+    var changeEffectPublisher: AnyPublisher<(Bool, Bool), Never> {
+        return bluetoothManager.$isFuzzOn.combineLatest(bluetoothManager.$isTremoloOn).eraseToAnyPublisher()
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -23,8 +28,8 @@ struct ContentView: View {
                         .foregroundColor(bluetoothManager.isConnected ? .blue : .red)
                         .frame(width: 40, height: 40)
                     Spacer()
-                    Toggle("Fuzz", isOn: $isFuzzOn)
-                    Toggle("Tremolo", isOn: $isTremoloOn)
+                    Toggle("Fuzz", isOn: $bluetoothManager.isFuzzOn)
+                    Toggle("Tremolo", isOn: $bluetoothManager.isTremoloOn)
                     Spacer()
                         .frame(height: 40)
                     Button(!bluetoothManager.isConnected ? "Connect" : "Disconnect") {
@@ -45,7 +50,23 @@ struct ContentView: View {
                 .frame(height: geometry.size.height)
                 Spacer()
             }
-            
+            .onReceive(changeEffectPublisher) { output in
+                if output != prevOutput {
+                    print(output)
+                    if output.0 == true && output.1 == true {
+                        bluetoothManager.writeData(command: .all)
+                    } else if output.0 == true && output.1 == false {
+                        bluetoothManager.writeData(command: .fuzz)
+                    } else if output.0 == false && output.1 == true {
+                        bluetoothManager.writeData(command: .tremolo)
+                    } else {
+                        bluetoothManager.writeData(command: .noEffect)
+                    }
+                    
+                    prevOutput = output
+                }
+                
+            }
         }
     }
 }
