@@ -56,11 +56,6 @@ volatile uint16_t t = 0;
 
 const int n_kernels = 2;
 
-int kernels[n_kernels] = {
-    1,
-    0
-};
-
 bool kernels_on[n_kernels] = {
     false,
     false
