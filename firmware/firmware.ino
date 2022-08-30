@@ -157,12 +157,6 @@ ISR(TIMER2_OVF_vect) {
     }
 }
 
-inline uint16_t test_func1(uint16_t value) {
-  return value / 2;
-}
-
-static const uint16_t (*func_ptr[1])(uint16_t) = {test_func1};
-
 ISR(TIMER1_OVF_vect) {
     uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
 
