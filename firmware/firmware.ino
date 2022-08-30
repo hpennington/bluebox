@@ -133,7 +133,7 @@ inline uint16_t fuzz(uint16_t value) {
     uint16_t half_point = min_value + ((max_value - min_value) / 2);
     
     value = clip(adc.value, half_point - 200, half_point + 200); 
-//    value = clip(value * 2, half_point - 200, half_point + 200); 
+    
     if (t == 6500) {
         min_value = half_point;
         max_value = half_point;
@@ -146,54 +146,15 @@ inline uint16_t fuzz(uint16_t value) {
 }
 
 volatile uint16_t tick = 0;
-volatile uint8_t tremolo_overflow_count = 0;
 
 inline uint16_t tremolo(uint16_t value) {
     return (float)value * ((float)sintab2[tick] / 4096.0);
 }
 
-inline uint16_t render(uint16_t value) {
-//    return tremolo(value);
-//    if (kernels_on[0] == true) {
-        value = tremolo(value);  
-//    }
-
-//    if (kernels_on[1] == true) {
-//        value = fuzz(value);
-//    }
-//    for (int i = 0; i < n_kernels; i += 1) {
-//        int kernel_id = kernels[i];
-//
-//        switch(kernel_id) {
-//            case 0:
-//                if (kernels_on[i] == true) {
-//                    value = fuzz(value);  
-//                }
-//                break;
-//            case 1:
-//                if (kernels_on[i] == true) {
-//                    value = tremolo(value);  
-//                }
-//                break;
-//        }
-//    }
-
-    return value;
-}
-
 ISR(TIMER2_OVF_vect) {
-//    if (tremolo_overflow_count > 6) {
-//        tremolo_overflow_count = 0;
-
-        tick += 1;
-//    } else {
-//      tremolo_overflow_count += 1;
-//    }
-
     if (tick > 300) {
-      tick = 0;
+        tick = 0;
     }
-//    Serial.println("TICK");
 }
 
 inline uint16_t test_func1(uint16_t value) {
@@ -203,15 +164,7 @@ inline uint16_t test_func1(uint16_t value) {
 static const uint16_t (*func_ptr[1])(uint16_t) = {test_func1};
 
 ISR(TIMER1_OVF_vect) {
-//    Serial.println(adc.value);
-    uint16_t value = adc.value;
-
-
-//    for (int i = 0; i < 1; i += 1) {
-//        value = (*func_ptr[0])(value);
-//    }
-    
-    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | value; 
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | adc.value; 
 
     if (!spi.is_transacting && finished_writing_SPI() == true) {
         PORTD &= ~(1 << PD4);
@@ -244,7 +197,6 @@ ISR(ADC_vect) {
         }
 
         if (kernels_on[0] == true) {
-            
             value = tremolo(value);
         }
 
