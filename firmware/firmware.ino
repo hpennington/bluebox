@@ -108,7 +108,7 @@ void loop() {
     }
 }
 
-uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
+inline uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
     if (value >= min_value && value <= max_value) {
       return value;
     } else if (value < min_value) {
