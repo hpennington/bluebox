@@ -15,7 +15,6 @@ SPIUnit spi;
 void print_data(uint8_t data_length) {
     if (data_length == 0) return;
     
-    // Accelerometer
     if (bluetooth.buffer[1] == 'A') {
         uint8_t x = parsefloat(bluetooth.buffer+2);
         Serial.println(x);
