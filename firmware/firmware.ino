@@ -43,6 +43,13 @@ void setup_spi_timer() {
     TIMSK1 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
 }
 
+void setup_tremolo_timer() {
+    TCCR2A = (0<<CS02) | (1<<CS01) | (1<<CS00); //set the pre-scalar as 1024
+    OCR2A = 50;
+    TCNT2 = 0;
+    TIMSK2 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
+}
+
 volatile uint16_t min_value = 4095;
 volatile uint16_t max_value = 0;
 volatile uint16_t t = 0;
@@ -71,6 +78,8 @@ void setup() {
     ADCUnit_start(&adc);
 
     setup_spi_timer();
+
+    setup_tremolo_timer();
     
     sei();
 }
@@ -114,7 +123,7 @@ uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
     }
 }
 
-uint16_t fuzz(uint16_t value) {
+inline uint16_t fuzz(uint16_t value) {
     if (value > max_value) {
       max_value = value;
     } else if (value < min_value) {
@@ -124,7 +133,7 @@ uint16_t fuzz(uint16_t value) {
     uint16_t half_point = min_value + ((max_value - min_value) / 2);
     
     value = clip(adc.value, half_point - 200, half_point + 200); 
-
+//    value = clip(value * 2, half_point - 200, half_point + 200); 
     if (t == 6500) {
         min_value = half_point;
         max_value = half_point;
@@ -133,36 +142,76 @@ uint16_t fuzz(uint16_t value) {
 
     t += 1;
 
+    return clip(value * 2, 0, 4096);
+}
+
+volatile uint16_t tick = 0;
+volatile uint8_t tremolo_overflow_count = 0;
+
+inline uint16_t tremolo(uint16_t value) {
+    return (float)value * ((float)sintab2[tick] / 4096.0);
+}
+
+inline uint16_t render(uint16_t value) {
+//    return tremolo(value);
+//    if (kernels_on[0] == true) {
+        value = tremolo(value);  
+//    }
+
+//    if (kernels_on[1] == true) {
+//        value = fuzz(value);
+//    }
+//    for (int i = 0; i < n_kernels; i += 1) {
+//        int kernel_id = kernels[i];
+//
+//        switch(kernel_id) {
+//            case 0:
+//                if (kernels_on[i] == true) {
+//                    value = fuzz(value);  
+//                }
+//                break;
+//            case 1:
+//                if (kernels_on[i] == true) {
+//                    value = tremolo(value);  
+//                }
+//                break;
+//        }
+//    }
+
     return value;
 }
 
-uint16_t tremolo(uint16_t value) {
-    return value;
-}
+ISR(TIMER2_OVF_vect) {
+//    if (tremolo_overflow_count > 6) {
+//        tremolo_overflow_count = 0;
 
-uint16_t render(uint16_t value) {
-    for (int i = 0; i < n_kernels; i += 1) {
-        int kernel_id = kernels[i];
+        tick += 1;
+//    } else {
+//      tremolo_overflow_count += 1;
+//    }
 
-        switch(kernel_id) {
-            case 0:
-                if (kernels_on[i] == true) {
-                    value = fuzz(value);  
-                }
-                break;
-            case 1:
-                if (kernels_on[i] == true) {
-                    value = tremolo(value);  
-                }
-                break;
-        }
+    if (tick > 300) {
+      tick = 0;
     }
-
-    return value;
+//    Serial.println("TICK");
 }
+
+inline uint16_t test_func1(uint16_t value) {
+  return value / 2;
+}
+
+static const uint16_t (*func_ptr[1])(uint16_t) = {test_func1};
 
 ISR(TIMER1_OVF_vect) {
-    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | render(adc.value); 
+//    Serial.println(adc.value);
+    uint16_t value = adc.value;
+
+
+//    for (int i = 0; i < 1; i += 1) {
+//        value = (*func_ptr[0])(value);
+//    }
+    
+    uint16_t out = (0 << 15) | (0 << 14) | (1 << 13) | (1 << 12) | value; 
 
     if (!spi.is_transacting && finished_writing_SPI() == true) {
         PORTD &= ~(1 << PD4);
@@ -189,6 +238,17 @@ ISR(TIMER1_OVF_vect) {
 ISR(ADC_vect) {
     if (!spi.is_transacting) {
         ADCUnit_update(&adc);
+        uint16_t value = adc.value;
+        if (kernels_on[1] == true) {
+            value = fuzz(value);
+        }
+
+        if (kernels_on[0] == true) {
+            
+            value = tremolo(value);
+        }
+
+        adc.value = value;
     }
     
     ADCSRA |= B01000000;
