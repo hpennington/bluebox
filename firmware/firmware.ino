@@ -5,7 +5,7 @@
 #include "spi_unit.h"
 #include "packetParser.h"
 #include "effects/fuzz.h"
-#include "sintab2.h"
+#include "effects/tremolo.h"
 
 #define SERIAL_PRINT_ON true
 
@@ -41,13 +41,6 @@ void setup_spi_timer() {
     OCR1A = 32768;
     TCNT1 = 0;
     TIMSK1 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
-}
-
-void setup_tremolo_timer() {
-    TCCR2A = (0<<CS02) | (1<<CS01) | (1<<CS00); //set the pre-scalar as 1024
-    OCR2A = 50;
-    TCNT2 = 0;
-    TIMSK2 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
 }
 
 const int n_kernels = 2;
@@ -101,20 +94,6 @@ void loop() {
                 kernels_on[1] = true;
                 break;
         }
-    }
-}
-
-volatile uint16_t tick = 0;
-
-inline uint16_t tremolo(uint16_t value) {
-    return (float)value * ((float)sintab2[tick] / 4096.0);
-}
-
-ISR(TIMER2_OVF_vect) {
-    tick += 1;
-
-    if (tick > 300) {
-        tick = 0;
     }
 }
 
