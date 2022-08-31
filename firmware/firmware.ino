@@ -6,21 +6,11 @@
 #include "packetParser.h"
 #include "effects/fuzz.h"
 #include "effects/tremolo.h"
-
-#define SERIAL_PRINT_ON true
+#include "print.h"
 
 Bluetooth bluetooth;
 ADCUnit adc;
 SPIUnit spi;
-
-void print_data(uint8_t data_length) {
-    if (data_length == 0) return;
-    
-    if (bluetooth.buffer[1] == 'A') {
-        uint8_t x = parsefloat(bluetooth.buffer+2);
-        Serial.println(x);
-    }
-}
 
 bool finished_writing_SPI() {
     return (SPSR & _BV(SPIF));
@@ -28,12 +18,6 @@ bool finished_writing_SPI() {
 
 void transfer(uint8_t data) {
     SPDR = data;
-}
-
-void setup_serial() {
-#ifdef SERIAL_PRINT_ON
-    Serial.begin(115200);
-#endif
 }
 
 void setup_spi_timer() {
@@ -70,9 +54,6 @@ void setup() {
 
 void loop() {
     uint8_t data_length = Bluetooth_read(&bluetooth);
-#ifdef SERIAL_PRINT_ON
-    print_data(data_length);
-#endif
 
     if (data_length > 0) {
         uint8_t command = bluetooth.buffer[2];
