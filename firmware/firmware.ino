@@ -4,6 +4,7 @@
 #include "adc_unit.h"
 #include "spi_unit.h"
 #include "packetParser.h"
+#include "effects/fuzz.h"
 #include "sintab2.h"
 
 #define SERIAL_PRINT_ON true
@@ -48,10 +49,6 @@ void setup_tremolo_timer() {
     TCNT2 = 0;
     TIMSK2 = (1 << TOIE1) ;   // Enable timer1 overflow interrupt(TOIE1)
 }
-
-volatile uint16_t min_value = 4095;
-volatile uint16_t max_value = 0;
-volatile uint16_t t = 0;
 
 const int n_kernels = 2;
 
@@ -107,38 +104,6 @@ void loop() {
     }
 }
 
-inline uint16_t clip(uint16_t value, uint16_t min_value, uint16_t max_value) {
-    if (value >= min_value && value <= max_value) {
-      return value;
-    } else if (value < min_value) {
-      return min_value;
-    } else {
-      return max_value;
-    }
-}
-
-inline uint16_t fuzz(uint16_t value) {
-    if (value > max_value) {
-      max_value = value;
-    } else if (value < min_value) {
-      min_value = value;
-    }
-
-    uint16_t half_point = min_value + ((max_value - min_value) / 2);
-    
-    value = clip(adc.value, half_point - 200, half_point + 200); 
-    
-    if (t == 6500) {
-        min_value = half_point;
-        max_value = half_point;
-        t = 0;
-    }
-
-    t += 1;
-
-    return clip(value * 2, 0, 4096);
-}
-
 volatile uint16_t tick = 0;
 
 inline uint16_t tremolo(uint16_t value) {
@@ -147,7 +112,7 @@ inline uint16_t tremolo(uint16_t value) {
 
 ISR(TIMER2_OVF_vect) {
     tick += 1;
-    
+
     if (tick > 300) {
         tick = 0;
     }
