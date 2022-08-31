@@ -146,6 +146,8 @@ inline uint16_t tremolo(uint16_t value) {
 }
 
 ISR(TIMER2_OVF_vect) {
+    tick += 1;
+    
     if (tick > 300) {
         tick = 0;
     }
