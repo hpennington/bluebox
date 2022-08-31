@@ -17,9 +17,9 @@
 #define READ_BUFSIZE                    (20)
 
 typedef struct Bluetooth {
-  SoftwareSerial *bluefruitSS;
-  Adafruit_BluefruitLE_UART *bluefruit;
-  uint8_t buffer[READ_BUFSIZE+1];
+    SoftwareSerial *bluefruitSS;
+    Adafruit_BluefruitLE_UART *bluefruit;
+    uint8_t buffer[READ_BUFSIZE+1];
 } Bluetooth;
 
 void Bluetooth_init(Bluetooth *bluetooth);
