@@ -10,10 +10,8 @@ import SwiftUI
 struct BLButtonViewProperties {
     static let width: CGFloat = 148
     static let height: CGFloat = 48
-    static let lightTextColor: Color = .white
-    static let lightBackgroundColor: Color = .black
-    static let darkTextColor: Color = .black
-    static let darkBackgroundColor: Color = .gray
+    static let textColor: Color = .white
+    static let backgroundColor: Color = .blue
     static let cornerRadius: CGFloat = 4
     static let horizontalPadding: CGFloat = 30
 }
@@ -21,8 +19,6 @@ struct BLButtonViewProperties {
 struct BLButtonView: View {
     let title: String
     let action: () -> Void
-    
-    @Environment(\.colorScheme) var colorScheme
     
     init(_ title: String, action: @escaping () -> Void) {
         self.title = title
@@ -33,8 +29,8 @@ struct BLButtonView: View {
         Button(action: action) {
             Text(title)
                 .frame(width: BLButtonViewProperties.width, height: BLButtonViewProperties.height)
-                .foregroundColor(colorScheme == .light ? BLButtonViewProperties.lightTextColor : BLButtonViewProperties.darkTextColor)
-                .background(colorScheme == .light ? BLButtonViewProperties.lightBackgroundColor : BLButtonViewProperties.darkBackgroundColor)
+                .foregroundColor(BLButtonViewProperties.textColor)
+                .background(BLButtonViewProperties.backgroundColor)
                 .cornerRadius(BLButtonViewProperties.cornerRadius)
         }
     }
